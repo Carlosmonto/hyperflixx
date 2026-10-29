@@ -1,0 +1,8 @@
+unit: generate-s3-volume
+side_effects:
+  - {source_loc: "scripts/generar_volumen_s3.py:91", effect: "creates temporary demo JSONL until target bytes and uploads one S3 object", must_preserve: true}
+branches:
+  - {source_loc: "scripts/generar_volumen_s3.py:116", condition: "target-gb or record-bytes <= 0", behavior: "raises ValueError", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/generar_volumen_s3.py:53", trigger: "seed partition is empty", outcome: "raises RuntimeError", contract: "RuntimeError", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/generar_volumen_s3.py:91", scope: "temporary file creation then single upload", isolation: "none", must_preserve: true}}

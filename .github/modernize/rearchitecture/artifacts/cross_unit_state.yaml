@@ -1,0 +1,2 @@
+flows: []
+notes: "No se identificaron flujos implícitos entre dos entry points. El resume token de CDC es estado persistido del mismo consumidor y el intercambio entre etapas ocurre mediante colecciones, archivos y reportes explícitos."

@@ -1,0 +1,31 @@
+modules:
+  - name: mongodb-connection
+    kind: config
+    source_loc: "conexion.py:14"
+    used_by_units: [create-structure, generate-data, transform-oltp-olap, build-data-warehouse, query-data-warehouse, export-bigquery, pipeline-data-lake, ingest-streaming, produce-cdc, benchmark-analytics, benchmark-oltp-olap, generate-dashboard, generate-catalog]
+    fields:
+      - {name: conectar_mongodb, type: "Callable[[str|None,bool], tuple[MongoClient, Database]]"}
+      - {name: MONGO_URI, type: "str|None"}
+      - {name: NOMBRE_BD, type: "str"}
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Centraliza credenciales, TLS, timeouts, selección de base y traducción de errores."
+  - name: data-lake-storage
+    kind: utility
+    source_loc: "data_lake_storage.py:15"
+    used_by_units: [pipeline-data-lake, generate-s3-volume]
+    fields:
+      - {name: backend, type: "str"}
+      - {name: uri, type: "str"}
+      - {name: bucket, type: "str"}
+      - {name: prefix, type: "str"}
+      - {name: uri_for, type: "Callable[[str], str]"}
+      - {name: write_lines, type: "Callable"}
+      - {name: iter_lines, type: "Callable"}
+      - {name: write_parquet, type: "Callable"}
+      - {name: upload_file, type: "Callable"}
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Adapta S3 y mantiene operaciones de archivos fuera del pipeline de transformación."

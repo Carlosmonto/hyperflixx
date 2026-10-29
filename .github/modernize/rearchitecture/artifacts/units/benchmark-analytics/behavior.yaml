@@ -1,0 +1,9 @@
+unit: benchmark-analytics
+side_effects:
+  - {source_loc: "scripts/benchmark_consultas_analiticas.py:272", effect: "writes timestamped and latest JSON benchmark reports", must_preserve: true}
+branches:
+  - {source_loc: "scripts/benchmark_consultas_analiticas.py:133", condition: "explain plan contains IXSCAN/COLLSCAN", behavior: "classifies actual plan", must_preserve: true}
+  - {source_loc: "scripts/benchmark_consultas_analiticas.py:28", condition: "benchmark latency compared with SLA_MS", behavior: "marks query inside/outside SLA", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/benchmark_consultas_analiticas.py:136", trigger: "explain operation failure", outcome: "reports DESCONOCIDO and continues", contract: "benchmark result status", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/benchmark_consultas_analiticas.py:188", scope: "each warmup/repetition query", isolation: "MongoDB default", must_preserve: true}}

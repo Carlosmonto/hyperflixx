@@ -1,0 +1,4 @@
+unit: generate-catalog
+bindings:
+  - {type: convention, name: "argparse --output", source_loc: "scripts/generar_catalogo.py:234", target: "CLI parser", must_appear_in_target: true, notes: "Output workbook path."}
+runtime_config: []

@@ -1,0 +1,4 @@
+unit: transform-oltp-olap
+bindings: []
+reason: "CLI ETL without framework wiring."
+runtime_config: []

@@ -1,0 +1,7 @@
+unit: transform-oltp-olap
+side_effects:
+  - {source_loc: "scripts/transformar_oltp_a_olap.py:18", effect: "merges enriched movies into peliculas_analiticas", must_preserve: true}
+branches: []
+error_paths:
+  - {source_loc: "scripts/transformar_oltp_a_olap.py:9", trigger: "MongoDB aggregation failure", outcome: "propagates error and closes client", contract: "driver exception", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/transformar_oltp_a_olap.py:11", scope: "single aggregation with $merge", isolation: "MongoDB default", must_preserve: true}}

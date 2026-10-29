@@ -1,0 +1,4 @@
+unit: build-data-warehouse
+commit: false
+candidate_splits:
+  - {id: "scripts/construir_data_warehouse.py:83-313", drivers: [concern_split, data_ownership_split], rationale: "Dimension and fact builders share connection setup but have distinct schemas and ownership; aggregate cubes are a separate analytical concern.", source_slice: {file: scripts/construir_data_warehouse.py, lines: [83, 313]}}

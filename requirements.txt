@@ -1,0 +1,11 @@
+pymongo
+boto3
+google-cloud-bigquery
+Faker
+certifi
+python-dotenv
+pandas
+pyarrow
+pyspark
+matplotlib
+openpyxl

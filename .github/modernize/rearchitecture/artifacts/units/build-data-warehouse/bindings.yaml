@@ -1,0 +1,5 @@
+unit: build-data-warehouse
+bindings: []
+reason: "CLI ETL without framework wiring."
+runtime_config:
+  - {key: DW_ZONA_HORARIA, source_loc: "scripts/construir_data_warehouse.py:30", source: env, default_value: UTC, must_appear_in_target: true, notes: "Must be consistent for date keys."}

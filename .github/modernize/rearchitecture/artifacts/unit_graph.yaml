@@ -1,0 +1,131 @@
+units:
+  - name: environment-setup
+    trigger: cli
+    trigger_detail: "python iac_setup.py"
+    source_anchors: [{path: iac_setup.py, line: 92}]
+    exported_signature: [{method: "int main()", source_loc: "iac_setup.py:92", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: []
+  - name: create-structure
+    trigger: cli
+    trigger_detail: "python scripts/crear_estructura.py"
+    source_anchors: [{path: scripts/crear_estructura.py, line: 9}]
+    exported_signature: [{method: "None crear_estructura_mflix()", source_loc: "scripts/crear_estructura.py:9", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: generate-data
+    trigger: cli
+    trigger_detail: "python scripts/generar_datos_masivos.py"
+    source_anchors: [{path: scripts/generar_datos_masivos.py, line: 19}]
+    exported_signature: [{method: "None generar_datos()", source_loc: "scripts/generar_datos_masivos.py:19", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: transform-oltp-olap
+    trigger: cli
+    trigger_detail: "python scripts/transformar_oltp_a_olap.py"
+    source_anchors: [{path: scripts/transformar_oltp_a_olap.py, line: 7}]
+    exported_signature: [{method: "None transformar_datos()", source_loc: "scripts/transformar_oltp_a_olap.py:7", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: create-structure, via: peliculas_analiticas collection}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: build-data-warehouse
+    trigger: cli
+    trigger_detail: "python scripts/construir_data_warehouse.py [--reconstruir]"
+    source_anchors: [{path: scripts/construir_data_warehouse.py, line: 327}]
+    exported_signature: [{method: "None construir_data_warehouse()", source_loc: "scripts/construir_data_warehouse.py:327", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: transform-oltp-olap, via: peliculas_analiticas collection}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: query-data-warehouse
+    trigger: cli
+    trigger_detail: "python scripts/consultas_data_warehouse.py"
+    source_anchors: [{path: scripts/consultas_data_warehouse.py, line: 77}]
+    exported_signature: [{method: "None ejecutar_consultas()", source_loc: "scripts/consultas_data_warehouse.py:77", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: build-data-warehouse, via: warehouse collections}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: export-bigquery
+    trigger: cli
+    trigger_detail: "python scripts/exportar_dwh_bigquery.py"
+    source_anchors: [{path: scripts/exportar_dwh_bigquery.py, line: 167}]
+    exported_signature: [{method: "None ejecutar_exportacion()", source_loc: "scripts/exportar_dwh_bigquery.py:167", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: build-data-warehouse, via: warehouse collections}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: pipeline-data-lake
+    trigger: cli
+    trigger_detail: "python scripts/pipeline_data_lake.py"
+    source_anchors: [{path: scripts/pipeline_data_lake.py, line: 100}]
+    exported_signature: [{method: "None ejecutar_pipeline()", source_loc: "scripts/pipeline_data_lake.py:100", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs:
+      - {module: mongodb-connection, used_fields: [conectar_mongodb]}
+      - {module: data-lake-storage, used_fields: [backend, uri_for, write_lines, iter_lines, write_parquet]}
+  - name: ingest-streaming
+    trigger: handler
+    trigger_detail: "MongoDB Change Stream sobre sample_mflix.movies"
+    source_anchors: [{path: scripts/ingesta_streaming.py, line: 45}]
+    exported_signature: [{method: "None ejecutar_ingesta()", source_loc: "scripts/ingesta_streaming.py:45", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: spark-analytics
+    trigger: job
+    trigger_detail: "python scripts/spark_jobs.py"
+    source_anchors: [{path: scripts/spark_jobs.py, line: 43}]
+    exported_signature: [{method: "None ejecutar_job()", source_loc: "scripts/spark_jobs.py:43", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: pipeline-data-lake, via: RAW movies JSONL}]
+    shared_refs: []
+  - name: generate-s3-volume
+    trigger: cli
+    trigger_detail: "python scripts/generar_volumen_s3.py --source-date ..."
+    source_anchors: [{path: scripts/generar_volumen_s3.py, line: 114}]
+    exported_signature: [{method: "None main()", source_loc: "scripts/generar_volumen_s3.py:114", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: pipeline-data-lake, via: RAW S3 seed}]
+    shared_refs: [{module: data-lake-storage, used_fields: [bucket, uri_for, iter_lines, upload_file]}]
+  - name: produce-cdc
+    trigger: cli
+    trigger_detail: "python scripts/productor_cdc.py --op ..."
+    source_anchors: [{path: scripts/productor_cdc.py, line: 141}]
+    exported_signature: [{method: "None main()", source_loc: "scripts/productor_cdc.py:141", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: benchmark-analytics
+    trigger: cli
+    trigger_detail: "python scripts/benchmark_consultas_analiticas.py"
+    source_anchors: [{path: scripts/benchmark_consultas_analiticas.py, line: 188}]
+    exported_signature: [{method: "dict ejecutar_benchmark(bool)", source_loc: "scripts/benchmark_consultas_analiticas.py:188", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: build-data-warehouse, via: warehouse collections}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: benchmark-oltp-olap
+    trigger: cli
+    trigger_detail: "python scripts/benchmarking_consultas.py"
+    source_anchors: [{path: scripts/benchmarking_consultas.py, line: 10}]
+    exported_signature: [{method: "None ejecutar_benchmark()", source_loc: "scripts/benchmarking_consultas.py:10", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: transform-oltp-olap, via: peliculas_analiticas collection}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: generate-dashboard
+    trigger: cli
+    trigger_detail: "python scripts/dashboard_monitoreo.py [--benchmark]"
+    source_anchors: [{path: scripts/dashboard_monitoreo.py, line: 249}]
+    exported_signature: [{method: "None generar_dashboard()", source_loc: "scripts/dashboard_monitoreo.py:249", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: [{unit: benchmark-analytics, via: benchmark_ultimo.json}]
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]
+  - name: generate-catalog
+    trigger: cli
+    trigger_detail: "python scripts/generar_catalogo.py"
+    source_anchors: [{path: scripts/generar_catalogo.py, line: 234}]
+    exported_signature: [{method: "int main()", source_loc: "scripts/generar_catalogo.py:234", stability: must_preserve}]
+    dynamic_entrypoints: []
+    depends_on: []
+    shared_refs: [{module: mongodb-connection, used_fields: [conectar_mongodb]}]

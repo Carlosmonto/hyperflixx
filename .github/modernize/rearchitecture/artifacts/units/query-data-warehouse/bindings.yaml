@@ -1,0 +1,4 @@
+unit: query-data-warehouse
+bindings: []
+reason: "CLI query runner without framework wiring."
+runtime_config: []

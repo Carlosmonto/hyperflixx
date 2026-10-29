@@ -1,0 +1,4 @@
+unit: export-bigquery
+commit: false
+candidate_splits:
+  - {id: "scripts/exportar_dwh_bigquery.py:85-164", drivers: [protocol_split, concern_split], rationale: "BSON serialization/schema conversion and BigQuery staging/publication have different external contracts and failure semantics.", source_slice: {file: scripts/exportar_dwh_bigquery.py, lines: [85, 164]}}

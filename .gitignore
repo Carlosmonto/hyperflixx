@@ -1,0 +1,53 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+gcp-credentials*.json
+service-account*.json
+*.pem
+*.key
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache
+.coverage
+coverage.xml
+htmlcov/
+
+# Generated data and reports
+data_lake/raw/
+data_lake/processed/
+data_lake/curated/
+data_lake/sample_mflix_import/
+*.bson
+reportes/*.json
+reportes/*.png
+*.xlsx
+*.parquet
+*.jsonl
+*.log
+
+# Terraform local files, plans, crash dumps and state
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfplan
+terraform/tfplan
+terraform/terraform.tfvars
+terraform/*.tfvars
+terraform/crash.log
+
+# Local tooling and operating-system files
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

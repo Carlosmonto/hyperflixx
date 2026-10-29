@@ -1,0 +1,7 @@
+unit: export-bigquery
+bindings: []
+reason: "CLI publisher; SDK configuration is represented as runtime config."
+runtime_config:
+  - {key: GCP_PROJECT_ID, source_loc: "scripts/exportar_dwh_bigquery.py:168", source: env, default_value: null, must_appear_in_target: true, notes: "Required BigQuery project."}
+  - {key: BIGQUERY_DATASET, source_loc: "scripts/exportar_dwh_bigquery.py:169", source: env, default_value: mongo_data_warehouse, must_appear_in_target: true, notes: "Published dataset."}
+  - {key: BIGQUERY_LOCATION, source_loc: "scripts/exportar_dwh_bigquery.py:182", source: env, default_value: US, must_appear_in_target: true, notes: "Dataset location."}

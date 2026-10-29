@@ -1,0 +1,6 @@
+unit: generate-s3-volume
+bindings: []
+reason: "CLI demo generator without framework wiring."
+runtime_config:
+  - {key: S3_DEMO_SOURCE_DATE, source_loc: "scripts/generar_volumen_s3.py:34", source: env, default_value: null, must_appear_in_target: true, notes: "Required seed partition when CLI flag absent."}
+  - {key: S3_DEMO_TARGET_GB, source_loc: "scripts/generar_volumen_s3.py:41", source: env, default_value: "1", must_appear_in_target: true, notes: "Demo object size."}

@@ -1,0 +1,6 @@
+unit: benchmark-analytics
+bindings: []
+reason: "CLI benchmark without framework wiring."
+runtime_config:
+  - {key: BENCH_SLA_MS, source_loc: "scripts/benchmark_consultas_analiticas.py:28", source: env, default_value: "499", must_appear_in_target: true, notes: "Measured SLA threshold."}
+  - {key: BENCH_REPETICIONES, source_loc: "scripts/benchmark_consultas_analiticas.py:29", source: env, default_value: "3", must_appear_in_target: true, notes: "Repetition count."}

@@ -1,0 +1,4 @@
+unit: generate-dashboard
+commit: false
+candidate_splits:
+  - {id: "scripts/dashboard_monitoreo.py:41-222", drivers: [concern_split], rationale: "Metric collection and six-panel rendering have separate dependencies and can fail independently.", source_slice: {file: scripts/dashboard_monitoreo.py, lines: [41, 222]}}

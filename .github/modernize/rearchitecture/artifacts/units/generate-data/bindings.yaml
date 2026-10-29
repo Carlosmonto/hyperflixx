@@ -1,0 +1,6 @@
+unit: generate-data
+bindings: []
+reason: "CLI script without framework wiring."
+runtime_config:
+  - {key: MFLIX_NUM_PELICULAS, source_loc: "scripts/generar_datos_masivos.py:12", source: env, default_value: "5000", must_appear_in_target: true, notes: "Synthetic load size."}
+  - {key: MFLIX_BATCH_SIZE, source_loc: "scripts/generar_datos_masivos.py:14", source: env, default_value: "1000", must_appear_in_target: true, notes: "Batch write size."}

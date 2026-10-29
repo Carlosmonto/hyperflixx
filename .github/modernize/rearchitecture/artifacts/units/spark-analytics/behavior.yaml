@@ -1,0 +1,9 @@
+unit: spark-analytics
+side_effects:
+  - {source_loc: "scripts/spark_jobs.py:106", effect: "overwrites curated Spark Parquet output for latest RAW partition", must_preserve: true}
+branches:
+  - {source_loc: "scripts/spark_jobs.py:31", condition: "Windows runtime", behavior: "requires bundled winutils and sets Hadoop environment", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/spark_jobs.py:52", trigger: "no RAW partition", outcome: "raises FileNotFoundError with prerequisite", contract: "FileNotFoundError", must_preserve: true}
+  - {source_loc: "scripts/spark_jobs.py:113", trigger: "Spark job error", outcome: "prints error and exits 1", contract: "CLI exit code 1", must_preserve: true}
+concurrency: {model: event-loop, tx_boundary: {source_loc: "scripts/spark_jobs.py:62", scope: "Spark write mode overwrite for one output partition", isolation: "Spark job commit semantics", must_preserve: true}}

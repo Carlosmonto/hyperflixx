@@ -1,0 +1,10 @@
+unit: generate-dashboard
+side_effects:
+  - {source_loc: "scripts/dashboard_monitoreo.py:260", effect: "writes dashboard PNG to reportes", must_preserve: true}
+  - {source_loc: "scripts/dashboard_monitoreo.py:84", effect: "may invoke benchmark and persist its report when --benchmark is used", must_preserve: true}
+branches:
+  - {source_loc: "scripts/dashboard_monitoreo.py:251", condition: "--benchmark or report absent", behavior: "runs benchmark before metric collection", must_preserve: true}
+  - {source_loc: "scripts/dashboard_monitoreo.py:68", condition: "fact_comentarios has documents", behavior: "uses warehouse fact table, otherwise comments", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/dashboard_monitoreo.py:55", trigger: "collStats aggregation failure", outcome: "uses collStats command fallback", contract: "metric collection continues", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/dashboard_monitoreo.py:249", scope: "read metrics then render one PNG", isolation: "MongoDB default", must_preserve: true}}

@@ -1,0 +1,4 @@
+unit: spark-analytics
+bindings:
+  - {type: convention, name: "SparkSession local[*]", source_loc: "scripts/spark_jobs.py:62", target: "SparkSession.builder", must_appear_in_target: true, notes: "Local Windows execution semantics."}
+runtime_config: []

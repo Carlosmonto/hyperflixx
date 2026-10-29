@@ -1,0 +1,10 @@
+unit: ingest-streaming
+side_effects:
+  - {source_loc: "scripts/ingesta_streaming.py:49", effect: "appends CDC events to date-partitioned JSONL and flushes each event", must_preserve: true}
+  - {source_loc: "scripts/ingesta_streaming.py:65", effect: "persists resume token after each change", must_preserve: true}
+branches:
+  - {source_loc: "scripts/ingesta_streaming.py:41", condition: "resume token exists", behavior: "opens Change Stream with resume_after", must_preserve: true}
+  - {source_loc: "scripts/ingesta_streaming.py:66", condition: "KeyboardInterrupt", behavior: "stops gracefully and closes connection", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/ingesta_streaming.py:68", trigger: "PyMongoError while watching", outcome: "raises RuntimeError after cleanup", contract: "RuntimeError", must_preserve: true}
+concurrency: {model: event-loop, tx_boundary: {source_loc: "scripts/ingesta_streaming.py:49", scope: "each event write and token persistence", isolation: "file append plus token write; no distributed transaction", must_preserve: true}}

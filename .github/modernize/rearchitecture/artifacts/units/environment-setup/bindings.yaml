@@ -1,0 +1,5 @@
+unit: environment-setup
+bindings: []
+reason: "CLI entry point without framework wiring."
+runtime_config:
+  - {key: MONGO_URI, source_loc: "iac_setup.py:66", source: env, default_value: null, must_appear_in_target: true, notes: "Atlas health check credential; CI secret only."}

@@ -1,0 +1,10 @@
+unit: create-structure
+side_effects:
+  - {source_loc: "scripts/crear_estructura.py:21", effect: "creates/verifies OLTP indexes", must_preserve: true}
+  - {source_loc: "scripts/crear_estructura.py:37", effect: "creates peliculas_analiticas when absent and its indexes", must_preserve: true}
+branches:
+  - {source_loc: "scripts/crear_estructura.py:15", condition: "required source collections are missing", behavior: "warns but continues", must_preserve: true}
+  - {source_loc: "scripts/crear_estructura.py:37", condition: "peliculas_analiticas exists", behavior: "preserves collection", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/crear_estructura.py:10", trigger: "Atlas connection failure", outcome: "connection helper raises RuntimeError; client is not used", contract: "RuntimeError", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/crear_estructura.py:9", scope: "individual index/collection operations", isolation: "MongoDB default", must_preserve: true}}

@@ -1,0 +1,10 @@
+unit: export-bigquery
+side_effects:
+  - {source_loc: "scripts/exportar_dwh_bigquery.py:131", effect: "loads each collection into temporary staging and replaces destination after completion", must_preserve: true}
+  - {source_loc: "scripts/exportar_dwh_bigquery.py:164", effect: "deletes staging table in finally", must_preserve: true}
+branches:
+  - {source_loc: "scripts/exportar_dwh_bigquery.py:153", condition: "collection is empty", behavior: "creates staging table with explicit schema before publication", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/exportar_dwh_bigquery.py:171", trigger: "missing GCP_PROJECT_ID or invalid batch size", outcome: "fails before clients are created", contract: "RuntimeError/ValueError", must_preserve: true}
+  - {source_loc: "scripts/exportar_dwh_bigquery.py:131", trigger: "MongoDB or BigQuery load failure", outcome: "destination is not copied and staging cleanup runs", contract: "load exception", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/exportar_dwh_bigquery.py:158", scope: "per-table staging load then atomic copy", isolation: "BigQuery job completion", must_preserve: true}}

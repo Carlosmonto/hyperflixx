@@ -1,0 +1,4 @@
+unit: generate-catalog
+commit: false
+candidate_splits:
+  - {id: "scripts/generar_catalogo.py:162-232", drivers: [concern_split], rationale: "Atlas metadata extraction and Excel formatting/export are distinct external side effects.", source_slice: {file: scripts/generar_catalogo.py, lines: [162, 232]}}

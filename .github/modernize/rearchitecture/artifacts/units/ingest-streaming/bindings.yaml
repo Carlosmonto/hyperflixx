@@ -1,0 +1,4 @@
+unit: ingest-streaming
+bindings:
+  - {type: listener, name: "MongoDB movies Change Stream", source_loc: "scripts/ingesta_streaming.py:49", target: "db.movies.watch", must_appear_in_target: true, notes: "Long-lived CDC listener with updateLookup."}
+runtime_config: []

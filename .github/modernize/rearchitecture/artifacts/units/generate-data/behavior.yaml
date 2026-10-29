@@ -1,0 +1,8 @@
+unit: generate-data
+side_effects:
+  - {source_loc: "scripts/generar_datos_masivos.py:45", effect: "inserts synthetic movies and comments in batches and updates comment counts", must_preserve: true}
+branches:
+  - {source_loc: "scripts/generar_datos_masivos.py:20", condition: "invalid generation limits", behavior: "raises ValueError before connecting", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/generar_datos_masivos.py:29", trigger: "MongoDB failure during batch writes", outcome: "propagates error after finally closes client", contract: "driver exception", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/generar_datos_masivos.py:45", scope: "each insert_many/bulk_write operation", isolation: "MongoDB default; no cross-batch transaction", must_preserve: true}}

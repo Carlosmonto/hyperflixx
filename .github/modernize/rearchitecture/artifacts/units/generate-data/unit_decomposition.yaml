@@ -1,0 +1,4 @@
+unit: generate-data
+commit: false
+candidate_splits:
+  - {id: "scripts/generar_datos_masivos.py:32-61", drivers: [concern_split], rationale: "Synthetic movie generation and related comment generation share a run but could evolve with different data-volume and referential-integrity rules.", source_slice: {file: scripts/generar_datos_masivos.py, lines: [32, 61]}}

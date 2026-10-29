@@ -1,0 +1,4 @@
+unit: produce-cdc
+commit: false
+candidate_splits:
+  - {id: "scripts/productor_cdc.py:51-112", drivers: [concern_split], rationale: "Insert, update and delete test-event emitters are independently callable behaviors with distinct input resolution paths.", source_slice: {file: scripts/productor_cdc.py, lines: [51, 112]}}

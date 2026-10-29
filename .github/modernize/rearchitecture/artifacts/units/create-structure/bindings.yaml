@@ -1,0 +1,4 @@
+unit: create-structure
+bindings: []
+reason: "CLI script; MongoDB collection/index operations are business wiring rather than a framework binding."
+runtime_config: []

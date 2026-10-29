@@ -1,0 +1,8 @@
+unit: pipeline-data-lake
+side_effects:
+  - {source_loc: "scripts/pipeline_data_lake.py:27", effect: "writes BSON-extended JSONL RAW to S3", must_preserve: true}
+  - {source_loc: "scripts/pipeline_data_lake.py:91", effect: "writes processed and curated Parquet partitions", must_preserve: true}
+branches: []
+error_paths:
+  - {source_loc: "scripts/pipeline_data_lake.py:104", trigger: "S3 or MongoDB failure", outcome: "propagates error and closes Mongo client", contract: "CLI failure", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/pipeline_data_lake.py:100", scope: "one RAW then processed then curated run", isolation: "none across objects", must_preserve: true}}

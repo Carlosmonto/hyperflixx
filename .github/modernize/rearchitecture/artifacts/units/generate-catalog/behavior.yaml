@@ -1,0 +1,8 @@
+unit: generate-catalog
+side_effects:
+  - {source_loc: "scripts/generar_catalogo.py:227", effect: "exports architecture summary and data dictionary to Excel", must_preserve: true}
+branches:
+  - {source_loc: "scripts/generar_catalogo.py:234", condition: "optional --output path", behavior: "writes catalog to requested output or default", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/generar_catalogo.py:151", trigger: "collStats failure", outcome: "uses zero size fallback for catalog metric", contract: "catalog row remains present", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/generar_catalogo.py:240", scope: "read collections then write workbook", isolation: "MongoDB default", must_preserve: true}}

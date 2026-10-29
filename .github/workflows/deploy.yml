@@ -1,0 +1,149 @@
+name: CI/CD DataOps
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dataops-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: true
+  TF_INPUT: false
+  TF_WORKING_DIR: terraform
+
+jobs:
+  python-validation:
+    name: Validar Python y ejecutar pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+
+      - name: Validar sintaxis
+        run: python -m compileall -q conexion.py data_lake_storage.py iac_setup.py scripts tests
+
+      - name: Ejecutar pruebas
+        run: python -m pytest -q
+
+  terraform-validation:
+    name: Validar Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.0"
+
+      - name: Verificar formato
+        run: terraform fmt -check -diff
+
+      - name: Inicializar Terraform
+        run: terraform init -backend=false
+
+      - name: Validar configuración
+        run: terraform validate
+
+  terraform-plan:
+    name: Ejecutar Terraform plan
+    if: github.event_name == 'push'
+    needs:
+      - python-validation
+      - terraform-validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    env:
+      TF_VAR_atlas_public_key: ${{ secrets.MONGODB_ATLAS_PUBLIC_KEY }}
+      TF_VAR_atlas_private_key: ${{ secrets.MONGODB_ATLAS_PRIVATE_KEY }}
+      TF_VAR_atlas_org_id: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+      TF_VAR_database_password: ${{ secrets.MONGODB_ATLAS_DATABASE_PASSWORD }}
+      TF_VAR_allowed_cidrs: ${{ secrets.MONGODB_ATLAS_ALLOWED_CIDRS }}
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.0"
+
+      - name: Inicializar Terraform
+        run: terraform init
+
+      - name: Ejecutar plan
+        run: terraform plan -out=tfplan
+
+      - name: Publicar plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ github.sha }}
+          path: terraform/tfplan
+          retention-days: 7
+
+  terraform-apply:
+    name: Aplicar infraestructura aprobada
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs:
+      - terraform-plan
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: terraform
+    env:
+      TF_VAR_atlas_public_key: ${{ secrets.MONGODB_ATLAS_PUBLIC_KEY }}
+      TF_VAR_atlas_private_key: ${{ secrets.MONGODB_ATLAS_PRIVATE_KEY }}
+      TF_VAR_atlas_org_id: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+      TF_VAR_database_password: ${{ secrets.MONGODB_ATLAS_DATABASE_PASSWORD }}
+      TF_VAR_allowed_cidrs: ${{ secrets.MONGODB_ATLAS_ALLOWED_CIDRS }}
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.11.0"
+
+      - name: Inicializar Terraform
+        run: terraform init
+
+      - name: Descargar plan aprobado
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ github.sha }}
+          path: terraform
+
+      - name: Aplicar plan
+        run: terraform apply -auto-approve tfplan

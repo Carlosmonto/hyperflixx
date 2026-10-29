@@ -1,0 +1,39 @@
+user_intent:
+  raw_request: "Analizar la arquitectura e integrar automatización CI/CD de la recomendación de GitHub Actions."
+  inferred_acceptance:
+    - "Validar Terraform y código Python automáticamente en cada push o pull request."
+    - "Ejecutar terraform plan sin exponer secretos."
+    - "Permitir despliegue controlado solo después de validaciones exitosas."
+  cleanup_required: false
+strategy: phased
+runtime_reachable:
+  - .github/workflows/deploy.yml
+  - terraform/
+  - requirements.txt
+  - conexion.py
+  - data_lake_storage.py
+  - scripts/
+must_rewrite:
+  - {path: .github/workflows/deploy.yml, reason: "Nuevo entry point de automatización solicitado por la imagen."}
+  - {path: requirements.txt, reason: "Dependencias reproducibles para runner limpio; versiones deben fijarse antes de CI estable."}
+  - {path: .gitignore, reason: "El workflow debe evitar artefactos, estados y credenciales generadas."}
+copy_as_is:
+  - terraform/main.tf
+  - terraform/variables.tf
+  - terraform/outputs.tf
+  - terraform/versions.tf
+  - conexion.py
+  - data_lake_storage.py
+legacy_allowed_to_remain:
+  - iac_setup.py
+  - scripts/productor_cdc.py
+  - scripts/generar_volumen_s3.py
+  - tools/hadoop/bin/winutils.exe
+defer_cleanup:
+  - "Separar pruebas unitarias de smoke/integration tests y fijar versiones de requirements.txt."
+  - "Definir backend remoto Terraform y política de red para runners antes de terraform apply."
+full_rewrite_reason: null
+implementation_rule: >
+  La integración usa must_rewrite y copia los módulos existentes. No debe inferir que
+  todos los scripts mutables son pasos de cada push; los scripts de larga duración o
+  destructivos quedan fuera del workflow automático hasta tener un entorno dedicado.

@@ -1,0 +1,6 @@
+unit: query-data-warehouse
+side_effects: []
+branches: []
+error_paths:
+  - {source_loc: "scripts/consultas_data_warehouse.py:78", trigger: "query or connection failure", outcome: "propagates driver error and closes client", contract: "CLI failure", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/consultas_data_warehouse.py:86", scope: "read-only aggregation per query", isolation: "MongoDB default", must_preserve: true}}

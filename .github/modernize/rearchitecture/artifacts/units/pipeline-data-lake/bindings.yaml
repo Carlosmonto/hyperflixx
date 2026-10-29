@@ -1,0 +1,6 @@
+unit: pipeline-data-lake
+bindings: []
+reason: "CLI batch pipeline without framework wiring."
+runtime_config:
+  - {key: DATA_LAKE_URI, source_loc: "data_lake_storage.py:24", source: env, default_value: null, must_appear_in_target: true, notes: "S3 URI."}
+  - {key: DATA_LAKE_READ_PREFERENCE, source_loc: "scripts/pipeline_data_lake.py:104", source: env, default_value: secondaryPreferred, must_appear_in_target: true, notes: "Mongo read preference."}

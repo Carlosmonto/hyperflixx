@@ -1,0 +1,10 @@
+unit: build-data-warehouse
+side_effects:
+  - {source_loc: "scripts/construir_data_warehouse.py:49", effect: "optionally drops warehouse collections with --reconstruir", must_preserve: true}
+  - {source_loc: "scripts/construir_data_warehouse.py:83", effect: "builds dimensions, facts and five aggregate cubes using $merge", must_preserve: true}
+  - {source_loc: "scripts/construir_data_warehouse.py:316", effect: "reports orphan fact references after load", must_preserve: true}
+branches:
+  - {source_loc: "scripts/construir_data_warehouse.py:328", condition: "--reconstruir is present", behavior: "destructive rebuild instead of incremental merge", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/construir_data_warehouse.py:329", trigger: "missing source collections or aggregation error", outcome: "propagates failure and closes client", contract: "CLI failure", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/construir_data_warehouse.py:83", scope: "each collection aggregation/$merge; no cross-collection transaction", isolation: "MongoDB default", must_preserve: true}}

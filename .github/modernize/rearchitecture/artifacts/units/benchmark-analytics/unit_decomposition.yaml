@@ -1,0 +1,4 @@
+unit: benchmark-analytics
+commit: false
+candidate_splits:
+  - {id: "scripts/benchmark_consultas_analiticas.py:116-185", drivers: [concern_split], rationale: "Index/explain inspection and latency measurement/report persistence have different observability responsibilities.", source_slice: {file: scripts/benchmark_consultas_analiticas.py, lines: [116, 185]}}

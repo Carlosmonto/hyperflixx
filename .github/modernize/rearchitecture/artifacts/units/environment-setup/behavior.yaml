@@ -1,0 +1,9 @@
+unit: environment-setup
+side_effects:
+  - {source_loc: "iac_setup.py:46", effect: "creates .venv and installs requirements.txt", must_preserve: true}
+  - {source_loc: "iac_setup.py:57", effect: "creates local data_lake directories", must_preserve: true}
+branches:
+  - {source_loc: "iac_setup.py:81", condition: "Python version below 3.10", behavior: "fails with explicit error and exit code 1", must_preserve: true}
+error_paths:
+  - {source_loc: "iac_setup.py:106", trigger: "missing/invalid .env or subprocess failure", outcome: "prints [IAC][ERROR] and returns 1", contract: "CLI exit code 1", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "iac_setup.py:99", scope: "none; sequential environment preparation", isolation: "none", must_preserve: true}}

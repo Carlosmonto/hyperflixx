@@ -1,0 +1,4 @@
+unit: benchmark-oltp-olap
+bindings: []
+reason: "CLI benchmark without framework wiring."
+runtime_config: []

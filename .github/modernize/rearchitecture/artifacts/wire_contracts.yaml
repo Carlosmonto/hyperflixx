@@ -1,0 +1,65 @@
+contracts:
+  - name: MongoDB Atlas application connection
+    unit: global
+    type: sdk
+    stability: must_preserve
+    source_loc: "conexion.py:14"
+    contract:
+      method: "MongoClient(MONGO_URI, TLS, timeouts)"
+      path: "mongodb+srv://"
+      request: "MONGO_URI and optional MONGO_DB"
+      response: "client and selected database"
+      error: "RuntimeError for missing URI, connectivity, configuration or authorization"
+      auth: "MongoDB Atlas URI credentials"
+    target_contract:
+      method: "Call conexion.conectar_mongodb(read_preference, validar) and close the returned client."
+      notes: "CI must provide credentials through an external secret, never a committed .env."
+    semantic_divergence: []
+  - name: Data Lake S3 object contract
+    unit: pipeline-data-lake
+    type: file
+    stability: must_preserve
+    source_loc: "scripts/pipeline_data_lake.py:24"
+    contract:
+      method: "read/write object"
+      path: "s3://bucket/prefix/{raw,processed,curated}/movies/fecha_carga=YYYY-MM-DD/"
+      request: "JSONL BSON-extended RAW or Parquet dataframe"
+      response: "S3 object"
+      error: "ValueError for invalid URI; RuntimeError for missing AWS profile/credentials"
+      auth: "AWS SDK session credentials"
+    target_contract:
+      method: "Preserve partition paths and JSONL/Parquet formats."
+      notes: "Workflow may validate configuration but should not create demo volume on push."
+    semantic_divergence: []
+  - name: BigQuery warehouse publication
+    unit: export-bigquery
+    type: sdk
+    stability: must_preserve
+    source_loc: "scripts/exportar_dwh_bigquery.py:131"
+    contract:
+      method: "BigQuery load staging then copy"
+      path: "dataset mongo_data_warehouse, nine named tables"
+      request: "MongoDB warehouse documents and explicit schemas"
+      response: "published tables after successful staging copy"
+      error: "fail before replacing destination; staging table deleted in finally"
+      auth: "Application Default Credentials"
+    target_contract:
+      method: "Run export-bigquery only after warehouse collections are built and GCP_PROJECT_ID is present."
+      notes: "Do not publish partial tables or embed service-account JSON in GitHub."
+    semantic_divergence: []
+  - name: Terraform Atlas provisioning
+    unit: global
+    type: file
+    stability: must_preserve
+    source_loc: "terraform/main.tf:1"
+    contract:
+      method: "terraform plan/apply"
+      path: "terraform/"
+      request: "Atlas API keys, org/project/cluster/database and CIDR variables"
+      response: "Atlas project, cluster, user and access list"
+      error: "Terraform validation/plan/apply diagnostics"
+      auth: "MONGODB_ATLAS_PUBLIC_KEY and MONGODB_ATLAS_PRIVATE_KEY or provider variables"
+    target_contract:
+      method: "CI runs terraform fmt -check, init, validate and plan; apply requires protected approval."
+      notes: "Remote encrypted state and runner network access are prerequisites for unattended apply."
+    semantic_divergence: []

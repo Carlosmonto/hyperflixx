@@ -1,0 +1,6 @@
+unit: benchmark-oltp-olap
+side_effects: []
+branches: []
+error_paths:
+  - {source_loc: "scripts/benchmarking_consultas.py:21", trigger: "MongoDB query failure", outcome: "propagates error and closes client", contract: "CLI failure", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/benchmarking_consultas.py:12", scope: "timed OLTP and OLAP aggregations", isolation: "MongoDB default", must_preserve: true}}

@@ -1,0 +1,4 @@
+unit: ingest-streaming
+commit: false
+candidate_splits:
+  - {id: "scripts/ingesta_streaming.py:20-43", drivers: [lifecycle_split], rationale: "Resume-token persistence and long-lived Change Stream consumption have different restart and durability responsibilities.", source_slice: {file: scripts/ingesta_streaming.py, lines: [20, 43]}}

@@ -1,0 +1,9 @@
+unit: produce-cdc
+side_effects:
+  - {source_loc: "scripts/productor_cdc.py:51", effect: "inserts, updates or deletes producer-tagged movies", must_preserve: true}
+branches:
+  - {source_loc: "scripts/productor_cdc.py:151", condition: "--op", behavior: "selects insert/update/delete/all operation", must_preserve: true}
+  - {source_loc: "scripts/productor_cdc.py:113", condition: "all with multiple iterations", behavior: "waits between CDC operations", must_preserve: true}
+error_paths:
+  - {source_loc: "scripts/productor_cdc.py:71", trigger: "no producer movie for update/delete", outcome: "raises RuntimeError with prerequisite", contract: "RuntimeError", must_preserve: true}
+concurrency: {model: sync, tx_boundary: {source_loc: "scripts/productor_cdc.py:51", scope: "individual movie write operations", isolation: "MongoDB default", must_preserve: true}}

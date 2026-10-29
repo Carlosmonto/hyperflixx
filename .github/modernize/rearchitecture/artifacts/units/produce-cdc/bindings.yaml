@@ -1,0 +1,4 @@
+unit: produce-cdc
+bindings:
+  - {type: convention, name: "argparse --op/--movie-id/--iterations", source_loc: "scripts/productor_cdc.py:141", target: "CLI parser", must_appear_in_target: true, notes: "Public test-data producer interface."}
+runtime_config: []

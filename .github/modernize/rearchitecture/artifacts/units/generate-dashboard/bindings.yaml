@@ -1,0 +1,6 @@
+unit: generate-dashboard
+bindings: []
+reason: "CLI report generator without framework wiring."
+runtime_config:
+  - {key: ATLAS_PLAN, source_loc: "scripts/dashboard_monitoreo.py:32", source: env, default_value: "M0 (gratuito)", must_appear_in_target: true, notes: "Displayed plan label."}
+  - {key: ATLAS_LIMITE_MB, source_loc: "scripts/dashboard_monitoreo.py:34", source: env, default_value: "512", must_appear_in_target: true, notes: "Displayed storage limit."}

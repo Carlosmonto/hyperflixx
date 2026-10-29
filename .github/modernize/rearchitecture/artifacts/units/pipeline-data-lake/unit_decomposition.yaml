@@ -1,0 +1,4 @@
+unit: pipeline-data-lake
+commit: false
+candidate_splits:
+  - {id: "scripts/pipeline_data_lake.py:24-98", drivers: [execution_model_split, concern_split], rationale: "RAW extraction, tabular normalization and curated KPI construction use distinct storage and transformation contracts.", source_slice: {file: scripts/pipeline_data_lake.py, lines: [24, 98]}}

@@ -1,0 +1,4 @@
+unit: environment-setup
+commit: false
+candidate_splits:
+  - {id: "iac_setup.py:46-88", drivers: [concern_split], rationale: "Virtual environment installation, local data-lake directory creation, environment validation and Atlas health checking are separate operational concerns.", source_slice: {file: iac_setup.py, lines: [46, 88]}}
