@@ -8,11 +8,6 @@ terraform {
     }
   }
 
-  backend "s3" {
-    key     = "mongo-data-lake/terraform.tfstate"
-    region  = "us-east-2"
-    encrypt = true
-  }
 }
 
 provider "mongodbatlas" {

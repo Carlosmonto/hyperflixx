@@ -27,8 +27,11 @@ terraform plan
 terraform apply
 ```
 
-El estado local puede contener identificadores y metadatos de infraestructura. Para un
-entorno compartido usa un backend remoto cifrado antes de aplicar en CI/CD.
+El estado local puede contener identificadores y metadatos de infraestructura. Por defecto
+Terraform usa estado local (`terraform.tfstate`, excluido de Git). Para un entorno
+compartido configura un backend remoto cifrado antes de aplicar en CI/CD: crea el bucket
+S3 y añade el bloque `backend "s3"` a `versions.tf`, o pásalo con
+`terraform init -backend-config=...`.
 
 ## GitHub Actions
 
